@@ -28,6 +28,8 @@
 #include "i386-io-beos.h"
 #elif defined(PCI_OS_DJGPP)
 #include "i386-io-djgpp.h"
+#elif defined(PCI_OS_DARWIN)
+#include "i386-io-darwin.h"
 #else
 #error Do not know how to access I/O ports on this OS.
 #endif
@@ -109,14 +111,14 @@ conf1_detect(struct pci_access *a)
       return 0;
     }
 
-  intel_io_lock();
+  //intel_io_lock();
   outb (0x01, 0xCFB);
   tmp = inl (0xCF8);
   outl (0x80000000, 0xCF8);
   if (inl (0xCF8) == 0x80000000)
     res = 1;
   outl (tmp, 0xCF8);
-  intel_io_unlock();
+  //intel_io_unlock();
 
   if (res)
     res = intel_sanity_check(a, &pm_intel_conf1);
@@ -132,7 +134,7 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
   if (pos >= 256)
     return 0;
 
-  intel_io_lock();
+  //intel_io_lock();
   outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
   switch (len)
@@ -150,7 +152,7 @@ conf1_read(struct pci_dev *d, int pos, byte *buf, int len)
       res = pci_generic_block_read(d, pos, buf, len);
     }
 
-  intel_io_unlock();
+  //intel_io_unlock();
   return res;
 }
 
@@ -163,7 +165,7 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
   if (pos >= 256)
     return 0;
 
-  intel_io_lock();
+  //intel_io_lock();
   outl(0x80000000 | ((d->bus & 0xff) << 16) | (PCI_DEVFN(d->dev, d->func) << 8) | (pos&~3), 0xcf8);
 
   switch (len)
@@ -180,7 +182,7 @@ conf1_write(struct pci_dev *d, int pos, byte *buf, int len)
     default:
       res = pci_generic_block_write(d, pos, buf, len);
     }
-  intel_io_unlock();
+  //intel_io_unlock();
   return res;
 }
 
@@ -201,13 +203,13 @@ conf2_detect(struct pci_access *a)
 
   /* This is ugly and tends to produce false positives. Beware. */
 
-  intel_io_lock();
+  //intel_io_lock();
   outb(0x00, 0xCFB);
   outb(0x00, 0xCF8);
   outb(0x00, 0xCFA);
   if (inb(0xCF8) == 0x00 && inb(0xCFA) == 0x00)
     res = intel_sanity_check(a, &pm_intel_conf2);
-  intel_io_unlock();
+  //intel_io_unlock();
   return res;
 }
 
@@ -224,7 +226,7 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
     /* conf2 supports only 16 devices per bus */
     return 0;
 
-  intel_io_lock();
+  //intel_io_lock();
   outb((d->func << 1) | 0xf0, 0xcf8);
   outb(d->bus, 0xcfa);
   switch (len)
@@ -242,7 +244,7 @@ conf2_read(struct pci_dev *d, int pos, byte *buf, int len)
       res = pci_generic_block_read(d, pos, buf, len);
     }
   outb(0, 0xcf8);
-  intel_io_unlock();
+  //intel_io_unlock();
   return res;
 }
 
@@ -258,7 +260,7 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
   if (d->dev >= 16)
     d->access->error("conf2_write: only first 16 devices exist.");
 
-  intel_io_lock();
+  //intel_io_lock();
   outb((d->func << 1) | 0xf0, 0xcf8);
   outb(d->bus, 0xcfa);
   switch (len)
@@ -277,7 +279,7 @@ conf2_write(struct pci_dev *d, int pos, byte *buf, int len)
     }
 
   outb(0, 0xcf8);
-  intel_io_unlock();
+  //intel_io_unlock();
   return res;
 }
 

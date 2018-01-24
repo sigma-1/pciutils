@@ -3,7 +3,7 @@
 
 OPT=-O2
 CFLAGS=$(OPT) -Wall -W -Wno-parentheses -Wstrict-prototypes -Wmissing-prototypes
-
+LDFLAGS=-framework IOKit
 VERSION=3.5.6
 DATE=2017-11-17
 
@@ -36,7 +36,7 @@ PREFIX=/usr/local
 SBINDIR=$(PREFIX)/sbin
 SHAREDIR=$(PREFIX)/share
 IDSDIR=$(SHAREDIR)
-MANDIR:=$(shell if [ -d $(PREFIX)/share/man ] ; then echo $(PREFIX)/share/man ; else echo $(PREFIX)/man ; fi)
+MANDIR:=$(PREFIX)/share/man
 INCDIR=$(PREFIX)/include
 LIBDIR=$(PREFIX)/lib
 PKGCFDIR=$(LIBDIR)/pkgconfig
